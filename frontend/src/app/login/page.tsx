@@ -34,99 +34,103 @@ export default function LoginPage() {
             }
         } catch (err: any) {
             console.error(err);
-            setError('Username atau password salah!');
+            setError('Username atau password salah');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-violet-50 flex items-center justify-center p-4 relative overflow-hidden">
-            {/* Decorative Blobs */}
-            <div className="absolute top-20 left-20 w-72 h-72 bg-blue-200/40 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-20 right-20 w-96 h-96 bg-violet-200/40 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-cyan-100/20 to-pink-100/20 rounded-full blur-3xl"></div>
-
+        <div className="min-h-screen bg-white flex items-center justify-center p-4">
             <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, type: 'spring' }}
-                className="max-w-sm w-full bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl p-8 shadow-2xl shadow-blue-500/10 z-10"
+                transition={{ duration: 0.4 }}
+                className="w-full max-w-md"
             >
-                <div className="flex flex-col items-center text-center mb-8">
+                {/* Header */}
+                <div className="flex flex-col items-center text-center mb-10">
                     <motion.div
-                        animate={{ rotate: [0, -5, 5, 0] }}
-                        transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
-                        className="p-4 bg-gradient-to-tr from-blue-500 to-violet-500 rounded-2xl shadow-lg shadow-blue-500/30 mb-4"
+                        whileHover={{ scale: 1.05 }}
+                        className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20 mb-6"
                     >
-                        <Gamepad2 className="h-8 w-8 text-white" />
+                        <Gamepad2 className="w-8 h-8 text-white" />
                     </motion.div>
-                    <h1 className="text-2xl font-black text-gray-900">ABC Game Arena</h1>
-                    <p className="text-gray-400 text-sm mt-1">Masuk ke akun Anda</p>
+                    <h1 className="text-3xl font-bold text-slate-900">ABC Arena</h1>
+                    <p className="text-slate-500 text-sm mt-2">Masuk ke akun Anda</p>
                 </div>
 
+                {/* Error Alert */}
                 {error && (
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-4 text-center font-medium"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg font-medium text-center"
                     >
-                        ❌ {error}
+                        {error}
                     </motion.div>
                 )}
 
-                <form onSubmit={handleLogin} className="space-y-4">
+                {/* Form */}
+                <form onSubmit={handleLogin} className="space-y-5">
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Username</label>
+                        <label className="block text-sm font-semibold text-slate-900 mb-2">Username</label>
                         <input
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            placeholder="Masukkan username..."
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition placeholder:text-gray-300"
+                            placeholder="Masukkan username"
+                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-sm focus:outline-none focus:border-blue-500 focus:bg-white transition"
                             required
                         />
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Password</label>
+                        <label className="block text-sm font-semibold text-slate-900 mb-2">Password</label>
                         <div className="relative">
                             <input
                                 type={showPw ? 'text' : 'password'}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Masukkan password..."
-                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 pr-12 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition placeholder:text-gray-300"
+                                placeholder="Masukkan password"
+                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-sm focus:outline-none focus:border-blue-500 focus:bg-white transition pr-10"
                                 required
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPw(!showPw)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                             >
-                                {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
                         </div>
                     </div>
 
                     <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
                         disabled={loading}
                         type="submit"
-                        className="w-full bg-gradient-to-r from-blue-500 via-violet-500 to-purple-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-violet-500/20 hover:brightness-105 transition flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
+                        className="w-full mt-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition disabled:opacity-60 flex items-center justify-center gap-2"
                     >
                         {loading ? (
-                            <><Loader2 className="h-4 w-4 animate-spin" /> Masuk...</>
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Masuk...
+                            </>
                         ) : (
-                            <><LogIn className="h-4 w-4" /> Masuk</>
+                            <>
+                                <LogIn className="w-4 h-4" />
+                                Masuk
+                            </>
                         )}
                     </motion.button>
                 </form>
 
-                <div className="mt-6 pt-4 border-t border-gray-100">
-                    <p className="text-[10px] text-gray-300 text-center">
-                        Admin: admin/admin • Pelanggan: pelanggan/pelanggan
+                {/* Info Footer */}
+                <div className="mt-8 pt-6 border-t border-slate-200 text-center">
+                    <p className="text-xs text-slate-400">
+                        Demo: pelanggan/pelanggan
                     </p>
                 </div>
             </motion.div>

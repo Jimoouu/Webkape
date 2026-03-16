@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Lock, User, LogIn } from 'lucide-react';
+import { Lock, LogIn, Loader2 } from 'lucide-react';
 import api from '@/lib/api';
 
 export default function AdminLogin() {
@@ -25,77 +25,96 @@ export default function AdminLogin() {
             router.push('/admin/dashboard');
         } catch (err: any) {
             console.error(err);
-            setError('Username atau password salah.');
+            setError('Username atau password salah');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 relative overflow-hidden">
-            <div className="absolute opacity-10 blur-3xl -left-20 bg-blue-500 w-96 h-96 rounded-full"></div>
-
+        <div className="min-h-screen bg-white flex items-center justify-center p-4">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="max-w-md w-full backdrop-blur-md bg-white/5 border border-white/10 rounded-3xl p-8 shadow-2xl z-10"
+                transition={{ duration: 0.4 }}
+                className="w-full max-w-md"
             >
-                <div className="flex flex-col items-center text-center mb-8">
-                    <div className="p-4 bg-gradient-to-tr from-blue-600 to-violet-600 rounded-2xl shadow-lg mb-4">
-                        <Lock className="h-8 w-8 text-white" />
-                    </div>
-                    <h1 className="text-2xl font-bold text-white">Admin Login</h1>
-                    <p className="text-slate-400 text-xs mt-1">ABC Game Arena Panel</p>
+                {/* Header */}
+                <div className="flex flex-col items-center text-center mb-10">
+                    <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20 mb-6"
+                    >
+                        <Lock className="w-8 h-8 text-white" />
+                    </motion.div>
+                    <h1 className="text-3xl font-bold text-slate-900">Admin Panel</h1>
+                    <p className="text-slate-500 text-sm mt-2">Masuk ke dashboard admin</p>
                 </div>
 
+                {/* Error Alert */}
                 {error && (
-                    <div className="bg-red-500/20 border border-red-500/30 text-red-300 text-xs p-3 rounded-xl mb-6 text-center">
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg font-medium text-center"
+                    >
                         {error}
-                    </div>
+                    </motion.div>
                 )}
 
+                {/* Form */}
                 <form onSubmit={handleLogin} className="space-y-5">
                     <div>
-                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Username</label>
-                        <div className="relative">
-                            <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
-                            <input
-                                type="text"
-                                placeholder="Masukkan username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-slate-100 focus:outline-none focus:border-blue-500 transition text-sm"
-                                required
-                            />
-                        </div>
+                        <label className="block text-sm font-semibold text-slate-900 mb-2">Username</label>
+                        <input
+                            type="text"
+                            placeholder="Masukkan username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-sm focus:outline-none focus:border-blue-500 focus:bg-white transition"
+                            required
+                        />
                     </div>
 
                     <div>
-                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Password</label>
-                        <div className="relative">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
-                            <input
-                                type="password"
-                                placeholder="Masukkan password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-slate-100 focus:outline-none focus:border-blue-500 transition text-sm"
-                                required
-                            />
-                        </div>
+                        <label className="block text-sm font-semibold text-slate-900 mb-2">Password</label>
+                        <input
+                            type="password"
+                            placeholder="Masukkan password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-sm focus:outline-none focus:border-blue-500 focus:bg-white transition"
+                            required
+                        />
                     </div>
 
                     <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
                         disabled={loading}
                         type="submit"
-                        className="w-full bg-gradient-to-r from-blue-600 to-violet-600 font-bold text-white py-3 px-4 rounded-xl shadow-lg shadow-blue-500/10 hover:brightness-110 active:scale-95 transition flex items-center justify-center gap-2 mt-2 disabled:opacity-50 text-sm"
+                        className="w-full mt-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition disabled:opacity-60 flex items-center justify-center gap-2"
                     >
-                        {loading ? 'Logging in...' : 'Login'}
-                        <LogIn className="h-4 w-4" />
+                        {loading ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Masuk...
+                            </>
+                        ) : (
+                            <>
+                                <LogIn className="w-4 h-4" />
+                                Masuk
+                            </>
+                        )}
                     </motion.button>
                 </form>
+
+                {/* Info Footer */}
+                <div className="mt-8 pt-6 border-t border-slate-200 text-center">
+                    <p className="text-xs text-slate-400">
+                        Demo: admin/admin
+                    </p>
+                </div>
             </motion.div>
         </div>
     );

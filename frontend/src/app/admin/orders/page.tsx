@@ -66,18 +66,18 @@ export default function OrdersPage() {
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
                 <div>
                     <h1 className="text-2xl font-black text-gray-900 flex items-center gap-2">
                         <Sparkles className="h-6 w-6 text-blue-500" /> Manajemen Pesanan
                     </h1>
-                    <p className="text-gray-400 text-sm mt-1">Daftar pesanan pelanggan (auto-refresh 10 detik)</p>
+                    <p className="text-gray-400 text-xs sm:text-sm mt-1">Daftar pesanan pelanggan (auto-refresh 10 detik)</p>
                 </div>
                 <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={fetchOrders}
-                    className="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition flex items-center gap-2 text-sm shadow-sm"
+                    className="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition flex items-center gap-2 text-sm shadow-sm w-fit"
                 >
                     <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
                 </motion.button>
@@ -91,25 +91,27 @@ export default function OrdersPage() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
-                            className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all"
+                            className="bg-white border border-gray-100 rounded-2xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-all"
                         >
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-100">
-                                <div className="flex items-center gap-4">
-                                    <div className="bg-blue-50 text-blue-600 font-black px-4 py-2 rounded-xl border border-blue-100">
-                                        Meja {order.table_number}
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-gray-900 text-base">{order.customer_name}</h3>
-                                        <p className="text-[10px] text-gray-400">#{order.id} • {new Date(order.created_at).toLocaleString('id-ID')}</p>
+                            <div className="flex flex-col gap-4 pb-4 border-b border-gray-100">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                                        <div className="bg-blue-50 text-blue-600 font-black px-3 py-2 rounded-xl border border-blue-100 text-sm flex-shrink-0">
+                                            {order.table_number}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <h3 className="font-bold text-gray-900 text-sm sm:text-base truncate">{order.customer_name}</h3>
+                                            <p className="text-[10px] text-gray-400">#{order.id} • {new Date(order.created_at).toLocaleString('id-ID', { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</p>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center justify-between gap-3">
                                     <div>
-                                        <p className="text-xs text-gray-400">Total Tagihan</p>
-                                        <p className="font-black text-blue-600">Rp {order.total_price.toLocaleString('id-ID')}</p>
+                                        <p className="text-xs text-gray-400">Total</p>
+                                        <p className="font-black text-blue-600 text-sm sm:text-base">Rp {order.total_price.toLocaleString('id-ID')}</p>
                                     </div>
-                                    <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full border ${getStatusBadge(order.status)}`}>
+                                    <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full border flex-shrink-0 ${getStatusBadge(order.status)}`}>
                                         {order.status.toUpperCase()}
                                     </span>
                                 </div>

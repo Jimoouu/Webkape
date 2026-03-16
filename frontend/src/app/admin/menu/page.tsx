@@ -125,10 +125,10 @@ export default function AdminMenuPage() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                 {/* Form Panel */}
                 <div className="lg:col-span-1">
-                    <form onSubmit={handleSubmitMenu} className="bg-white border border-gray-100 rounded-2xl p-6 sticky top-8 shadow-sm">
+                    <form onSubmit={handleSubmitMenu} className="bg-white border border-gray-100 rounded-2xl p-4 sm:p-6 sticky top-8 shadow-sm max-h-fit lg:max-h-[80vh] overflow-y-auto">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                                 {editingId ? <Edit2 className="h-5 w-5 text-amber-500" /> : <Plus className="h-5 w-5 text-blue-500" />}
@@ -215,6 +215,26 @@ export default function AdminMenuPage() {
                                         placeholder="https://images.unsplash.com/..."
                                     />
                                 </div>
+                                
+                                {imageUrl && (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="mt-3 rounded-xl overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center h-32"
+                                    >
+                                        <Image
+                                            src={imageUrl}
+                                            alt="Preview"
+                                            width={200}
+                                            height={200}
+                                            className="object-cover w-full h-full"
+                                            onError={(e) => {
+                                                console.error('Image load error');
+                                            }}
+                                            unoptimized
+                                        />
+                                    </motion.div>
+                                )}
                             </div>
 
                             <label className="flex items-center justify-between p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition">
@@ -244,7 +264,7 @@ export default function AdminMenuPage() {
                 </div>
 
                 {/* List Panel */}
-                <div className="lg:col-span-2 bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+                <div className="lg:col-span-2 bg-white border border-gray-100 rounded-2xl p-4 sm:p-6 shadow-sm">
                     <h2 className="text-lg font-bold text-gray-900 mb-4">Daftar Menu ({menus.length})</h2>
 
                     {loading ? (
@@ -252,7 +272,7 @@ export default function AdminMenuPage() {
                             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 overflow-y-auto max-h-[80vh]">
                             <AnimatePresence>
                                 {menus.map((menu) => {
                                     const imgSrc = getImageSrc(menu);

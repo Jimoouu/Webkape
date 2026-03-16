@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
     DollarSign, ShoppingBag, CheckCheck, Calendar,
-    ArrowUpRight, TrendingUp, Download, Filter
+    ArrowUpRight, TrendingUp, Download, Filter, Search, ChevronRight, HelpCircle
 } from 'lucide-react';
 import Link from 'next/link';
 import api from '@/lib/api';
@@ -35,8 +35,11 @@ interface Order {
 export default function Dashboard() {
     const [stats, setStats] = useState<Stats | null>(null);
     const [recentOrders, setRecentOrders] = useState<Order[]>([]);
+    const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [period, setPeriod] = useState(7);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState<string | null>(null);
     const reportRef = useRef<HTMLDivElement>(null);
 
     const fetchData = async () => {
@@ -56,6 +59,23 @@ export default function Dashboard() {
     useEffect(() => {
         fetchData();
     }, [period]);
+
+    useEffect(() => {
+        let filtered = recentOrders;
+        
+        if (searchTerm) {
+            filtered = filtered.filter(order =>
+                order.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                order.id.toString().includes(searchTerm)
+            );
+        }
+        
+        if (statusFilter) {
+            filtered = filtered.filter(order => order.status === statusFilter);
+        }
+        
+        setFilteredOrders(filtered);
+    }, [searchTerm, statusFilter, recentOrders]);
 
     const handleDownloadPDF = async () => {
         if (!reportRef.current) return;
@@ -86,11 +106,49 @@ export default function Dashboard() {
         );
     }
 
+    const getTrendIcon = (value: number) => {
+        if (value > 0) return <ArrowUpRight className="h-4 w-4 text-emerald-600" />;
+        if (value < 0) return <ArrowUpRight className="h-4 w-4 text-red-600 rotate-180" />;
+        return null;
+    };
+
     const statCards = [
-        { name: 'Total Pendapatan', value: `Rp ${(stats?.total_revenue || 0).toLocaleString('id-ID')}`, icon: DollarSign, color: 'from-emerald-400 to-green-500', bgLight: 'bg-emerald-50', textColor: 'text-emerald-600' },
-        { name: 'Total Pesanan', value: stats?.total_orders || 0, icon: ShoppingBag, color: 'from-blue-400 to-indigo-500', bgLight: 'bg-blue-50', textColor: 'text-blue-600' },
-        { name: 'Pesanan Selesai', value: stats?.completed_orders || 0, icon: CheckCheck, color: 'from-violet-400 to-purple-500', bgLight: 'bg-violet-50', textColor: 'text-violet-600' },
-        { name: 'Pesanan Hari Ini', value: stats?.todays_orders || 0, icon: Calendar, color: 'from-amber-400 to-orange-500', bgLight: 'bg-amber-50', textColor: 'text-amber-600' },
+        { 
+            name: 'Total Pendapatan', 
+            value: `Rp ${(stats?.total_revenue || 0).toLocaleString('id-ID')}`, 
+            trend: 12,
+            icon: DollarSign, 
+            color: 'from-emerald-400 to-green-500', 
+            bgLight: 'bg-emerald-50', 
+            textColor: 'text-emerald-600' 
+        },
+        { 
+            name: 'Total Pesanan', 
+            value: stats?.total_orders || 0, 
+            trend: 8,
+            icon: ShoppingBag, 
+            color: 'from-blue-400 to-indigo-500', 
+            bgLight: 'bg-blue-50', 
+            textColor: 'text-blue-600' 
+        },
+        { 
+            name: 'Pesanan Selesai', 
+            value: stats?.completed_orders || 0, 
+            trend: 15,
+            icon: CheckCheck, 
+            color: 'from-violet-400 to-purple-500', 
+            bgLight: 'bg-violet-50', 
+            textColor: 'text-violet-600' 
+        },
+        { 
+            name: 'Pesanan Hari Ini', 
+            value: stats?.todays_orders || 0, 
+            trend: 5,
+            icon: Calendar, 
+            color: 'from-amber-400 to-orange-500', 
+            bgLight: 'bg-amber-50', 
+            textColor: 'text-amber-600' 
+        },
     ];
 
     const getStatusStyle = (status: string) => {
@@ -143,14 +201,26 @@ export default function Dashboard() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.1 }}
-                        className="bg-white border border-gray-100 rounded-2xl p-6 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                        className="bg-white border border-gray-100 rounded-2xl p-6 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow group cursor-pointer"
                     >
-                        <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${stat.color} opacity-10 blur-2xl rounded-full -mr-10 -mt-10`}></div>
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className={`p-2 ${stat.bgLight} rounded-xl`}>
-                                <stat.icon className={`h-5 w-5 ${stat.textColor}`} />
+                        <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${stat.color} opacity-5 blur-2xl rounded-full -mr-10 -mt-10 group-hover:opacity-10 transition-opacity`}></div>
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                                <div className={`p-2 ${stat.bgLight} rounded-xl`}>
+                                    <stat.icon className={`h-5 w-5 ${stat.textColor}`} />
+                                </div>
+                                <span className="text-xs text-gray-400 font-medium">{stat.name}</span>
                             </div>
-                            <span className="text-xs text-gray-400 font-medium">{stat.name}</span>
+                            {stat.trend !== undefined && (
+                                <motion.div
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    className="flex items-center gap-1 bg-emerald-50 px-2 py-1 rounded-lg"
+                                >
+                                    <ArrowUpRight className="h-3 w-3 text-emerald-600" />
+                                    <span className="text-xs font-bold text-emerald-600">+{stat.trend}%</span>
+                                </motion.div>
+                            )}
                         </div>
                         <h2 className="text-2xl font-black text-gray-900">{stat.value}</h2>
                     </motion.div>
@@ -162,15 +232,15 @@ export default function Dashboard() {
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="lg:col-span-2 bg-white border border-gray-100 rounded-3xl p-6 shadow-sm"
+                    className="lg:col-span-2 bg-white border border-gray-100 rounded-3xl p-4 sm:p-6 shadow-sm"
                 >
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
                         <div>
                             <h2 className="text-lg font-bold text-gray-900">Tren Pendapatan</h2>
                             <p className="text-xs text-gray-400">Akumulasi penjualan {period} hari terakhir</p>
                         </div>
                     </div>
-                    <div className="h-[300px] w-full">
+                    <div className="h-[250px] sm:h-[300px] w-full overflow-x-auto">
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={stats?.revenue_trend || []}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
@@ -269,14 +339,47 @@ export default function Dashboard() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm overflow-hidden"
+                    className="bg-white border border-gray-100 rounded-3xl p-4 sm:p-6 shadow-sm overflow-hidden flex flex-col"
                 >
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-bold text-gray-900">Riwayat Terakhir</h2>
-                        <Link href="/admin/orders" className="text-xs font-bold text-blue-500 hover:underline">Lihat Semua</Link>
+                        <Link href="/admin/orders" className="text-xs font-bold text-blue-500 hover:underline flex items-center gap-1">
+                            Lihat Semua <ChevronRight className="h-3 w-3" />
+                        </Link>
                     </div>
-                    <div className="space-y-3">
-                        {recentOrders.map((order) => (
+
+                    {/* Search and Filter */}
+                    <div className="flex flex-col gap-3 mb-4">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Cari pelanggan atau ID pesanan..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        
+                        <div className="flex gap-2 flex-wrap">
+                            {['menunggu', 'diproses', 'selesai'].map(status => (
+                                <button
+                                    key={status}
+                                    onClick={() => setStatusFilter(statusFilter === status ? null : status)}
+                                    className={`px-3 py-1 text-xs font-bold rounded-lg transition ${
+                                        statusFilter === status
+                                            ? 'bg-blue-500 text-white'
+                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    }`}
+                                >
+                                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="space-y-3 flex-1 overflow-y-auto max-h-[400px]">
+                        {filteredOrders.map((order) => (
                             <div key={order.id} className="flex items-center justify-between p-3 rounded-2xl border border-gray-50 hover:bg-gray-50 transition-colors">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-black text-xs">
@@ -295,6 +398,13 @@ export default function Dashboard() {
                                 </div>
                             </div>
                         ))}
+                        
+                        {filteredOrders.length === 0 && (
+                            <div className="flex flex-col items-center justify-center py-8 text-center">
+                                <HelpCircle className="h-8 w-8 text-gray-300 mb-2" />
+                                <p className="text-sm text-gray-400">Tidak ada pesanan yang ditemukan</p>
+                            </div>
+                        )}
                     </div>
                 </motion.div>
             </div>
